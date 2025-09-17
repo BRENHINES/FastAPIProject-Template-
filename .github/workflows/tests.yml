@@ -1,0 +1,76 @@
+name: Tests
+
+on:
+  workflow_call:
+    inputs:
+      python-version:
+        required: false
+        type: string
+        default: '3.12'
+  workflow_dispatch:
+
+jobs:
+  tests:
+    name: Pytest + Coverage (with Postgres)
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: app
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=5
+
+    env:
+      DATABASE_URL: postgresql+asyncpg://postgres:postgres@localhost:5432/app
+      SYNC_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/app
+      SECRET_KEY: test-secret
+      ALGORITHM: HS256
+      ACCESS_TOKEN_EXPIRE_MINUTES: 60
+      API_V1_PREFIX: /api/v1
+      BACKEND_CORS_ORIGINS: http://localhost:3000
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ inputs.python-version }}
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install -U pip
+          pip install -e .[dev]
+
+      - name: Wait for Postgres
+        run: |
+          until pg_isready -h localhost -p 5432 -U postgres; do
+            sleep 1
+          done
+
+      - name: Run migrations
+        run: alembic upgrade head
+
+      - name: Tests + Coverage
+        run: |
+          python -m pip install coverage
+          coverage run -m pytest -q
+          coverage xml
+
+      - name: Upload coverage artifact
+        uses: actions/upload-artifact@v4
+        if: success() || failure()
+        with:
+          name: coverage-xml
+          path: coverage.xml

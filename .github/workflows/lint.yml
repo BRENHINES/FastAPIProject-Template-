@@ -1,0 +1,38 @@
+name: Lint
+
+on:
+  workflow_call:
+    inputs:
+      python-version:
+        required: false
+        type: string
+        default: '3.12'
+  workflow_dispatch:
+
+
+jobs:
+  lint:
+    name: Ruff (lint)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ inputs.python-version }}
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install -U pip
+          pip install -e .[dev]
+
+      - name: Ruff check
+        run: ruff check .
+
+      # Optionnel : Flake8 si tu le gardes en plus de Ruff
+      - name: Flake8
+        if: always()
+        run: flake8 . || true
