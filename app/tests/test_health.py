@@ -1,8 +1,12 @@
-import unittest
+from httpx import AsyncClient
+from app.main import app
 
-class MyTestCase(unittest.TestCase):
-    def test_something(self):
-        self.assertEqual(True, False)  # add assertion here
+import pytest
 
-if __name__ == '__main__':
-    unittest.main()
+
+@pytest.mark.anyio
+async def test_health_root():
+    async with AsyncClient(app=app, base_url="http://test") as ac:
+        res = await ac.get("/health")
+    assert res.status_code == 200
+    assert res.json()["status"] == "ok"
