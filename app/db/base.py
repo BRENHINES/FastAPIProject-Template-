@@ -1,7 +1,8 @@
 from __future__ import annotations
+
 from typing import Any
 
-from sqlalchemy import MetaData, DateTime, func
+from sqlalchemy import DateTime, MetaData, func
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 # Convention de nommage pour Alembic (contraintes stables)
@@ -13,8 +14,10 @@ naming_convention = {
     "pk": "pk_%(table_name)s",
 }
 
+
 class Base(DeclarativeBase):
     metadata = MetaData(naming_convention=naming_convention)
+
 
 class TimestampMixin:
     created_at: Mapped[Any] = mapped_column(
@@ -23,8 +26,3 @@ class TimestampMixin:
     updated_at: Mapped[Any] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False
     )
-
-class ReprMixin:
-    def __repr__(self) -> str:  # pragma: no cover
-        attrs = [f"{k}={getattr(self, k)!r}" for k in self.__mapper__.c.keys()]  # type: ignore[attr-defined]
-        return f"<{self.__class__.__name__} {' '.join(attrs)}>"

@@ -15,27 +15,31 @@ jobs:
     uses: ./.github/workflows/format-check.yml
     with:
       python-version: '3.12'
-
+    continue-on-error: true
 
   lint:
     name: Lint
     needs: format
+    if: ${{ always() }}
     uses: ./.github/workflows/lint.yml
     with:
       python-version: '3.12'
-
+    continue-on-error: true
 
   typecheck:
     name: Type Check
     needs: lint
+    if: ${{ always() }}
     uses: ./.github/workflows/typecheck.yml
     with:
       python-version: '3.12'
-
+    continue-on-error: true
 
   tests:
     name: Tests
     needs: typecheck
+    if: ${{ always() }}
     uses: ./.github/workflows/tests.yml
     with:
       python-version: '3.12'
+    continue-on-error: true

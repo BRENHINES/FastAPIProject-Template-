@@ -1,6 +1,6 @@
-from typing import List, Optional
 from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
 
 class Settings(BaseSettings):
     # App
@@ -21,16 +21,16 @@ class Settings(BaseSettings):
     BACKEND_CORS_ORIGINS: str = ""
 
     # DB
-    DATABASE_URL: str          # async: postgresql+asyncpg://...
-    SYNC_DATABASE_URL: str     # sync: pour Alembic
+    DATABASE_URL: str  # async: postgresql+asyncpg://...
+    SYNC_DATABASE_URL: str  # sync: pour Alembic
 
     # Optionnel: seed superuser
-    SUPERUSER_EMAIL: Optional[str] = None
-    SUPERUSER_PASSWORD: Optional[str] = None
+    SUPERUSER_EMAIL: str | None = None
+    SUPERUSER_PASSWORD: str | None = None
 
     # Observabilité
     LOG_LEVEL: str = "INFO"
-    SENTRY_DSN: Optional[str] = None
+    SENTRY_DSN: str | None = None
 
     model_config = SettingsConfigDict(env_file=".env", case_sensitive=False)
 
@@ -40,9 +40,10 @@ class Settings(BaseSettings):
         return v.lower()
 
     @property
-    def cors_origins(self) -> List[str]:
+    def cors_origins(self) -> list[str]:
         if not self.BACKEND_CORS_ORIGINS:
             return []
         return [o.strip() for o in self.BACKEND_CORS_ORIGINS.split(",") if o.strip()]
+
 
 settings = Settings()

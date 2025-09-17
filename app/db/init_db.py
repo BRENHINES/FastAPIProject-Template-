@@ -3,7 +3,6 @@
 - En dev, on peut s'assurer que le schéma existe.
 - Création optionnelle d'un superutilisateur si variables .env fournies.
 """
-from typing import Optional
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -22,7 +21,7 @@ async def ensure_schema_if_dev() -> None:
         await conn.run_sync(Base.metadata.create_all)
 
 
-async def seed_superuser(session: AsyncSession) -> Optional[int]:
+async def seed_superuser(session: AsyncSession) -> int | None:
     """Crée un superutilisateur si SUPERUSER_EMAIL/PASSWORD sont définis."""
     if not settings.SUPERUSER_EMAIL or not settings.SUPERUSER_PASSWORD:
         return None
@@ -43,3 +42,4 @@ async def seed_superuser(session: AsyncSession) -> Optional[int]:
 async def init_db(session: AsyncSession) -> None:
     await ensure_schema_if_dev()
     await seed_superuser(session)
+    return None
