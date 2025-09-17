@@ -61,3 +61,11 @@ source = ["app"]
 [tool.pytest.ini_options]
 addopts = "-q"
 testpaths = ["app/tests"]
+
+[tool.setuptools]
+package-dir = {"" = "."}
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["app*"]
+exclude = ["alembic*", "scripts*", "app/tests*", ".github*"]
