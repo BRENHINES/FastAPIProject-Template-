@@ -31,4 +31,5 @@ jobs:
           pip install -e .[dev]
 
       - name: Run mypy
+        if: always()
         run: mypy app
