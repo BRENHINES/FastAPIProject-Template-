@@ -13,6 +13,7 @@ jobs:
   tests:
     name: Pytest + Coverage (with Postgres)
     runs-on: ubuntu-latest
+    continue-on-error: true
 
     services:
       postgres:

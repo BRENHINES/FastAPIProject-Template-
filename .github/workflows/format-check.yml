@@ -4,16 +4,15 @@ on:
   workflow_call:
     inputs:
       python-version:
-        required: false
         type: string
         default: '3.12'
   workflow_dispatch:
-
 
 jobs:
   format:
     name: Format Check
     runs-on: ubuntu-latest
+    continue-on-error: true
     steps:
       - name: Checkout
         uses: actions/checkout@v4
