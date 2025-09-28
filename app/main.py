@@ -17,6 +17,21 @@ app = FastAPI(
     openapi_url=f"{settings.API_V1_PREFIX}/openapi.json",
 )
 
+app = FastAPI(
+    title="TP",
+    version="1.0.0",
+    description=(
+        "Producer API exposant des données nettoyées d'une bibliothèque"
+        "et des statistiques enrichies stockées"
+    ),
+    openapi_tags=[
+        {"name": "Health", "description": "Endpoints de santé"},
+    ],
+    docs_url="/docs",
+    redoc_url="/redoc",
+    openapi_url=f"{settings.API_V1_PREFIX}/openapi.json",
+)
+
 
 # CORS
 origins = [o.strip() for o in settings.BACKEND_CORS_ORIGINS.split(",") if o]
